@@ -6,5 +6,5 @@ This is a collection of Requests for Comments for the UNIFY project.
 
 ## RFC Process
 
-The RFC process is defined by UnifyProject/draft/RFC-1.
+The RFC process is defined by [UnifyProject/draft/RFC-1](https://github.com/hintjens/RFC-1/blob/master/draft/rfc-1.md).
 
