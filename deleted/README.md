@@ -1,0 +1,1 @@
+When raw or draft specifications are abandoned, they become **deleted** specifications. To change a deleted specification, the editor should first make it a raw specification again. Deleted specifications have no contractual weight.
