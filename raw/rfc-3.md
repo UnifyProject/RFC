@@ -40,9 +40,9 @@ SUNS defines one schema, "suns", with this structure:
         |
         o- function
 
-++ SUNS resource types
+## SUNS resource types
 
-+++ Nodes
+### Nodes
 
 Nodes follow these rules:
 
@@ -87,15 +87,15 @@ A node document specifies the node properties, and has references to all public 
 
 The node document does not necessarily list all functions and switches: clients may create these as private and thus make them inaccessible through discovery.
 
-+++ Functions
+### Functions
 
 To be defined.
 
-+++ Switches
+### Switches
 
 To be defined.
 
-+++ Ports
+### Ports
 
 To be defined.
 
