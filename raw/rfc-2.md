@@ -91,15 +91,15 @@ All replies contain a 3-digit status code that conforms to the [HTTP/1.1 specifi
 
 ### XRAP Resources
 
-Server-side resources are either //public// (shared by many clients) or //private// (to a single client). Public resources are named by formal or informal agreement, while the server alone is responsible for naming private resources. The URI of a resource is based on the resource name, so clients can know the URIs of public resources in advance, while the server provides the URIs of private resources at runtime.
+Server-side resources are either *public* (shared by many clients) or *private* (to a single client). Public resources are named by formal or informal agreement, while the server alone is responsible for naming private resources. The URI of a resource is based on the resource name, so clients can know the URIs of public resources in advance, while the server provides the URIs of private resources at runtime.
 
-Resources are either //structured// or //opaque//. A structured resource has properties that both client and server can access and modify. Resources can contain references (URIs) to child resources. An opaque resource has a MIME type and a binary content that the API never examines nor modifies.
+Resources are either *structured* or *opaque*. A structured resource has properties that both client and server can access and modify. Resources can contain references (URIs) to child resources. An opaque resource has a MIME type and a binary content that the API never examines nor modifies.
 
-The resource types form a static //schema// attached to a root type. The set of actual resources that a server holds form a dynamic //resource tree//, attached to a public root resource. To navigate the resource tree, clients retrieve the root resource and inspect it. Not all resources are discoverable: to work with a private resource an client must have created it, and thus know its URI.
+The resource types form a static *schema* attached to a root type. The set of actual resources that a server holds form a dynamic *resource tree*, attached to a public root resource. To navigate the resource tree, clients retrieve the root resource and inspect it. Not all resources are discoverable: to work with a private resource an client must have created it, and thus know its URI.
 
-The API represents structured resources as interchangeable XML or JSON //resource documents//, at the choice of the client. XRAP specifies the grammar for representing resources and their properties.
+The API represents structured resources as interchangeable XML or JSON *resource documents*, at the choice of the client. XRAP specifies the grammar for representing resources and their properties.
 
-Lastly the API has three mechanisms for lazy asynchronous retrieval and delivery of resources, and one mechanism for event-driven monitoring of resource updates. RESTful APIs, like HTTP, are nominally synchronous and use a request-response pattern for all resource actions. The first mechanism is the //asynclet// resource, given a URI before it exists: the client retrieves the asynclet and receives the resource as soon as it comes into existence. The second mechanism is more typical for HTTP: //streaming// of new resources to the client, typically used for event notification. Lastly, a client can ask to be notified when a resource is changed.
+Lastly the API has three mechanisms for lazy asynchronous retrieval and delivery of resources, and one mechanism for event-driven monitoring of resource updates. RESTful APIs, like HTTP, are nominally synchronous and use a request-response pattern for all resource actions. The first mechanism is the *asynclet* resource, given a URI before it exists: the client retrieves the asynclet and receives the resource as soon as it comes into existence. The second mechanism is more typical for HTTP: *streaming* of new resources to the client, typically used for event notification. Lastly, a client can ask to be notified when a resource is changed.
 
 #### Resource URIs
 
@@ -132,6 +132,8 @@ Clients create new resources through the API as follows:
 * The client creates a public resource by specifying a name. Otherwise the server names the resource, which is then private.
 * The server either returns a status code 2xx with a resource document, or 4xx or 5xx with an error text.
 * The server, after creating the resource, returns "201 Created" with the new URI in the Location: header.
+
+Here is the walkthrough from client to server:
 
     Client                                     Server
     |                                           |
@@ -184,7 +186,7 @@ The server may return these response codes specifically for a POST request:
 
 In case of a 4xx or 5xx error response the server will return a textual error message in the content body of the response. The client should be able to handle all normal HTTP errors, such as "401 Unauthorized", "404 Not Found", "413 Too Large", "500 Internal Error", and so on.
 
-Creating public resources is //idempotent//, i.e. repeated requests to create the same public resource are allowed, and safe. Clients should treat "200 OK" and "201 Created" as equally successful.
+Creating public resources is *idempotent*, i.e. repeated requests to create the same public resource are allowed, and safe. Clients should treat "200 OK" and "201 Created" as equally successful.
 
 #### Retrieving a Resource
 
@@ -194,6 +196,8 @@ Clients retrieve resources through the API as follows:
 * The client sends a GET method to the resource URI.
 * The client optionally specifies headers to do a conditional retrieval (caching).
 * The server either returns "200 OK" with a resource document, "304 Not Modified" with no content, or 4xx or 5xx with an error text.
+
+Here is the walkthrough from client to server:
 
     Client                                     Server
     |                                           |
@@ -233,7 +237,7 @@ The server may return these response codes specifically for a GET request:
 
 In case of a 4xx or 5xx error response the server will return a textual error message in the content body of the response. The client should be able to handle all normal HTTP errors, such as "401 Unauthorized", "404 Not Found", "413 Too Large", "500 Internal Error", and so on.
 
-//Conditional retrieval// is used to cache resources and fetch them only if they have changed. Clients retrieve resources conditionally as follows:
+*Conditional retrieval* is used to cache resources and fetch them only if they have changed. Clients retrieve resources conditionally as follows:
 
 * The client must previously have retrieved the resource.
 * The client does a GET method with If-None-Match: and If-Modified-Since: headers.
@@ -250,7 +254,7 @@ This is the general form of a client HTTP request to conditionally retrieve a re
 
 A conditional get only takes effect if there were no other errors, i.e. if the result would otherwise be "200 OK". It is valid to send either of the If-None-Match: or If-Modified-Since: headers but for best results, use both.
 
-Retrieving a resource has //no side effects//, i.e. repeated requests to retrieve the same resource will provoke the same responses, unless a third party deletes or modifies the resource.
+Retrieving a resource has *no side effects*, i.e. repeated requests to retrieve the same resource will provoke the same responses, unless a third party deletes or modifies the resource.
 
 #### Updating a Resource
 
@@ -261,6 +265,8 @@ Clients update resources through the API as follows:
 * The client sends a PUT method to the resource URI with the modified resource document.
 * The client optionally specifies headers to do a conditional update.
 * The server either returns 2xx with a resource document, or 4xx or 5xx with an error text.
+
+Here is the walkthrough from client to server:
 
     Client                                     Server
     |                                           |
@@ -307,7 +313,7 @@ The server may return these response codes specifically for a PUT request:
 
 In case of a 4xx or 5xx error response the server will return a textual error message in the content body of the response. The client should be able to handle all normal HTTP errors, such as "401 Unauthorized", "404 Not Found", "413 Too Large", "500 Internal Error", and so on.
 
-//Conditional update// is used to detect and prevent update conflicts (when multiple clients try to update the same resource at the same time). Clients conditionally update resources conditionally as follows:
+*Conditional update* is used to detect and prevent update conflicts (when multiple clients try to update the same resource at the same time). Clients conditionally update resources conditionally as follows:
 
 * The client must previously have retrieved the resource.
 * The client does a DELETE method with If-Match: and If-Unmodified-Since: headers.
@@ -324,7 +330,7 @@ This is the general form of a client HTTP request to conditionally update a reso
 
 A conditional PUT only takes effect if there were no other errors, i.e. if the result would otherwise be "200 OK". It is valid to send either of the If-Match: or If-Unmodified-Since: headers but for best results, use both.
 
-Modifying resources is //idempotent//, i.e. repeated requests to modify the same resource are allowed, and safe, unless a third party modifies or deletes the resource.
+Modifying resources is *idempotent*, i.e. repeated requests to modify the same resource are allowed, and safe, unless a third party modifies or deletes the resource.
 
 #### Deleting a Resource
 
@@ -335,6 +341,8 @@ Clients delete resources through the API as follows:
 * The client sends a DELETE method, specifying the resource URI.
 * The client optionally specifies headers to do a conditional delete.
 * The server either returns "200 OK", or 4xx or 5xx with an error text.
+
+Here is the walkthrough from client to server:
 
     Client                                     Server
     |                                           |
@@ -370,7 +378,7 @@ The server may return these response codes specifically for a DELETE request:
 
 In case of a 4xx or 5xx error response the server will return a textual error message in the content body of the response. The client should be able to handle all normal HTTP errors, such as "401 Unauthorized", "404 Not Found", "413 Too Large", "500 Internal Error", and so on.
 
-//Conditional delete// is used to detect and prevent delete conflicts (when multiple clients try to delete the same resource at the same time). Clients conditionally delete resources conditionally as follows:
+*Conditional delete* is used to detect and prevent delete conflicts (when multiple clients try to delete the same resource at the same time). Clients conditionally delete resources conditionally as follows:
 
 * The client must previously have retrieved the resource.
 * The client does a DELETE method with If-Match: and If-Unmodified-Since: headers.
@@ -387,7 +395,7 @@ This is the general form of a client HTTP request to conditionally delete a reso
 
 A conditional DELETE only takes effect if there were no other errors, i.e. if the result would otherwise be "200 OK". It is valid to send either of the If-Match: or If-Unmodified-Since: headers but for best results, use both.
 
-Deleting resources is //idempotent//, i.e. repeated requests to delete the same resource are allowed, and safe. Implementations may cache the URIs of deleted resources in order to differentiate between deletes on already-deleted resources, and deletes on resources that never existed.
+Deleting resources is *idempotent*, i.e. repeated requests to delete the same resource are allowed, and safe. Implementations may cache the URIs of deleted resources in order to differentiate between deletes on already-deleted resources, and deletes on resources that never existed.
 
 If the resource to be deleted contains other resources, these are implicitly and silently deleted along with the resource.
 
@@ -419,15 +427,15 @@ XRAP proposes three mechanisms for asynchronous non-polled resource delivery. In
 
 The three asynchronous delivery mechanisms are:
 
-* //Creation notification//, in which a resource is delivered only when it is created. XRAP implements this using "asynchronous resource instances", or "asynclets".
+* *Creation notification*, in which a resource is delivered only when it is created. XRAP implements this using "asynchronous resource instances", or "asynclets".
 
-* //Streaming//, in which a resource is delivered in segments, over time. XRAP has no specific support for streaming: it is implemented using multipart contents, but otherwise looks like a conventional resource GET.
+* *Streaming*, in which a resource is delivered in segments, over time. XRAP has no specific support for streaming: it is implemented using multipart contents, but otherwise looks like a conventional resource GET.
 
-* //Update notification//, in which a resource is delivered only when it is changed. XRAP implements this using the custom When-Modified-After: and When-None-Match: headers.
+* *Update notification*, in which a resource is delivered only when it is changed. XRAP implements this using the custom When-Modified-After: and When-None-Match: headers.
 
 #### Creation Notification via Asynclets
 
-An asynclet is a resource that is given a URI identifier //before// it exists. When the client retrieves the asynclet, the server will respond only when the resource has come into existence.
+An asynclet is a resource that is given a URI identifier *before* it exists. When the client retrieves the asynclet, the server will respond only when the resource has come into existence.
 
 Asynclets are used in a specific case: when resources sit in some kind of a queue that is retrieved and emptied by the client (using GET and DELETE in a loop). The queue would be the parent resource (the "container"). The queue then contains zero or more existing resources plus a single asynclet.
 
@@ -532,9 +540,9 @@ Our goals with this design are:
 
 XRAP resource documents obey these basic rules:
 
-* All resource documents in an API are part of a //schema// that defines the type tree.
-* The resource document has a //document root// element with the name of the schema.
-* The document root contains zero or more //resource roots//.
+* All resource documents in an API are part of a *schema* that defines the type tree.
+* The resource document has a *document root* element with the name of the schema.
+* The document root contains zero or more *resource roots*.
 * The resource root elements may contain other elements.
 * All elements except the document root correspond to XRAP resources, with the name of the element equal to the resource type.
 * Resource properties are represented as element attributes, not as child elements.
