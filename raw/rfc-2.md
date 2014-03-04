@@ -316,7 +316,7 @@ In case of a 4xx or 5xx error response the server will return a textual error me
 *Conditional update* is used to detect and prevent update conflicts (when multiple clients try to update the same resource at the same time). Clients conditionally update resources conditionally as follows:
 
 * The client must previously have retrieved the resource.
-* The client does a DELETE method with If-Match: and If-Unmodified-Since: headers.
+* The client does a PUT method with If-Match: and If-Unmodified-Since: headers.
 * The server returns "412 Precondition Failed" if the client's copy is out of date.
 * The server returns "200 OK" and the new resource document if the client's copy was up-to-date.
 
