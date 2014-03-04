@@ -15,7 +15,15 @@ The current editing process is:
 
 ## Current RFCs
 
-### RFC 2: Simple Universal Node Schema (SUNS)
+### RFC 2: Extensible Resource Access Protocol (XRAP)
+
+Status: raw.
+
+This document proposes the Extensible Resource Access Protocol, a set of conventions for working with remote resources. XRAP divides domain-specific APIs from transport layers (HTTP, ZMTP, IPC, etc.), and ensures that such APIs have a consistent grammar.
+
+* [Read UnifyProject/raw/RFC-2](https://github.com/UnifyProject/RFC/blob/master/raw/rfc-2.md).
+
+### RFC 3: Simple Universal Node Schema (SUNS)
 
 Status: raw.
 
@@ -23,10 +31,11 @@ This document proposes the Simple Universal Node Schema, a resource model for wo
 
 * [Read UnifyProject/raw/RFC-3](https://github.com/UnifyProject/RFC/blob/master/raw/rfc-3.md).
 
-### RFC 1: Extensible Resource Access Protocol (XRAP)
+### RFC 4: XRAP-ZMTP - Remote Resource Access via ZeroMQ
 
 Status: raw.
 
-This document proposes the Extensible Resource Access Protocol, a set of conventions for working with remote resources. XRAP divides domain-specific APIs from transport layers (HTTP, ZMTP, IPC, etc.), and ensures that such APIs have a consistent grammar.
+This document proposes XRAP-ZMTP, a mapping for XRAP over the ZeroMQ Message Transfer Protocol. XRAP-ZMTP encodes the XRAP methods and headers in binary frames, and carries content bodies as JSON.
 
-* [Read UnifyProject/raw/RFC-2](https://github.com/UnifyProject/RFC/blob/master/raw/rfc-2.md).
+* [Read UnifyProject/raw/RFC-4](https://github.com/UnifyProject/RFC/blob/master/raw/rfc-4.md).
+
