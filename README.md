@@ -15,10 +15,18 @@ The current editing process is:
 
 ## Current RFCs
 
-### Extensible Resource Access Protocol (XRAP)
+### RFC 2: Simple Universal Node Schema (SUNS)
+
+Status: raw.
+
+This document proposes the Simple Universal Node Schema, a resource model for working with UNIFY "Universal Nodes". SUNS defines the resources that a client can create, modify, retrieve, and delete on a node (the "server").
+
+* [Read UnifyProject/raw/RFC-3](https://github.com/UnifyProject/RFC/blob/master/raw/rfc-3.md).
+
+### RFC 1: Extensible Resource Access Protocol (XRAP)
 
 Status: raw.
 
 This document proposes the Extensible Resource Access Protocol, a set of conventions for working with remote resources. XRAP divides domain-specific APIs from transport layers (HTTP, ZMTP, IPC, etc.), and ensures that such APIs have a consistent grammar.
 
-* [Read UnifyProject/draft/RFC-2](https://github.com/UnifyProject/RFC/blob/master/raw/rfc-2.md).
+* [Read UnifyProject/raw/RFC-2](https://github.com/UnifyProject/RFC/blob/master/raw/rfc-2.md).
