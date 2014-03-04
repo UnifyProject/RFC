@@ -133,6 +133,8 @@ Clients create new resources through the API as follows:
 * The server either returns a status code 2xx with a resource document, or 4xx or 5xx with an error text.
 * The server, after creating the resource, returns "201 Created" with the new URI in the Location: header.
 
+Here is the walkthrough from client to server:
+
     Client                                     Server
     |                                           |
     |  1.) POST to parent URI                   |
