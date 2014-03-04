@@ -11,7 +11,7 @@ Copyright (c) 2014 all Contributors.
 
 This text is published under the [Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/) (CC BY-SA 4.0). You are free to: share (copy and redistribute the material in any medium or format), and adapt (remix, transform, and build upon the material for any purpose, even commercially). The licensor cannot revoke these freedoms as long as you follow the license terms.
 
-This text is governed by UnifyProject/RFC-1.
+This text is governed by [UnifyProject/draft/RFC-1](https://github.com/UnifyProject/RFC/blob/master/draft/rfc-1.md).
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED",  "MAY", and "OPTIONAL" in this document are to be interpreted as described in [RFC 2119](http://tools.ietf.org/html/rfc2119), "Key words for use in RFCs to Indicate Requirement Levels".
 
@@ -43,7 +43,7 @@ Our performance goals are at most hundreds of transactions per second. High-perf
 
 ## Design of the Protocol
 
-XRAP defines a consistent protocol for creating, retrieving, updating, and deleting remote resources. To reduce the learning curve and element of surprise, and allow maximum adoption in the market, we have used [http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm www.ics.uci.edu RESTful] design principles, and we have kept HTTP/1.1 compatibility.
+XRAP defines a consistent protocol for creating, retrieving, updating, and deleting remote resources. To reduce the learning curve and element of surprise, and allow maximum adoption in the market, we have used [RESTful design principles](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm www.ics.uci.edu), and we have kept HTTP/1.1 compatibility.
 
 REST is a design pattern rather than a formal specification. It is not formal about e.g. one updates a resource using PUT, or POST, nor does it explain how to represent resources. It is also incomplete in areas such as asynchronous event delivery.
 
@@ -87,7 +87,7 @@ Additionally, we use two custom headers to allow event-driven work:
 * When-Modified-After - GET on resource date change.
 * When-None-Match - GET on resource ETag change.
 
-All replies contain a 3-digit status code that conforms to the [http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html HTTP/1.1 specification] for status codes.
+All replies contain a 3-digit status code that conforms to the [HTTP/1.1 specifications](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html) for status codes.
 
 ### XRAP Resources
 
@@ -505,7 +505,7 @@ When-Modified-After: {resource date and time}
 
 The server will respond with the new resource document when it is modified. The client should be able to handle any HTTP error condition, such as "404 Not Found" or "501 Not Implemented". If both headers are specified, the server will respond only when both conditions are true.
 
-Further explanation of the When-Modified-After: header can be found in [http://cometdaily.com/2007/12/27/a-standards-based-approach-to-comet-communication-with-rest/ the Comet specifications] from 2007.
+Further explanation of the When-Modified-After: header can be found in [the Comet specifications](http://cometdaily.com/2007/12/27/a-standards-based-approach-to-comet-communication-with-rest/) from 2007.
 
 ### Caching and ETags
 
@@ -746,6 +746,6 @@ XRAP assumes the underlying transport provides authentication and privacy, if ne
 
 ## Further Reading
 
-XRAP is heavily influenced by and derived from [http://www.restms.org/spec:1 RESTful Transport Layer] (RestTL), part of the [http://www.restms.org RestMS] protocol stack. RestTL is itself inspired by the design of [http://www.ietf.org/rfc/rfc4287.txt AtomPub] (IETF RFC 4287).
+XRAP is heavily influenced by and derived from the [RESTful Transport Layer](http://www.restms.org/spec:1) (RestTL), part of [the RestMS protocol stack](http://www.restms.org). RestTL is itself inspired by the design of [AtomPub](http://www.ietf.org/rfc/rfc4287.txt) (IETF RFC 4287).
 
-The core semantics for XRAP are taken from [http://www.ietf.org/rfc/rfc2616.txt the HTTP/1.1 specifications].
+The core semantics for XRAP are taken from [the HTTP/1.1 specifications](http://www.ietf.org/rfc/rfc2616.txt).
