@@ -1,4 +1,4 @@
-# Specification Process
+# A Specification Process
 
 This document proposes a process for building interoperable technical specifications. This process is lightweight, and seeks to engage the widest possible range of interested parties, moving rapidly to consensus through working code.
 
@@ -38,9 +38,7 @@ This process resolves natural conflicts between teams and vendors by allowing an
 
 ## Overall Process
 
-We collaborate using an asychronous source control system, using the [C4.1 collaboration contract](http://rfc.zeromq.org/spec:22). In brief, this drives all work forward through "pull requests" that are merged into specifications or reference code.
-
-The project MAY require a statement from contributors that their contributions will conform to the project's copyright, patent, and trademark policies.
+The project SHOULD require a statement from each contributor that their contributions will conform to the project's copyright, patent, and trademark policies.
 
 Each specification SHALL BE a separate text file, in Markdown format.
 
@@ -51,6 +49,8 @@ A new version of a specification SHALL be a new specification, with a new number
 Lower numbers SHALL thus indicate more mature specifications, and higher numbers more experimental specifications.
 
 Any contributor SHALL have the right to create a new specification, either from scratch, or by forking an existing specification.
+
+The project SHALL have a well-defined process for editing and contributing to specifications.
 
 ## Specification Lifecycle
 
