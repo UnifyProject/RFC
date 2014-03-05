@@ -50,7 +50,7 @@ Nodes follow these rules:
 * The server MAY implement multiple nodes.
 * Nodes MAY be used to partition resources for authenticated access control.
 * Nodes are configured resources: clients do not create or destroy nodes.
-* Nodes act as namespaces for switches and functions.
+* Nodes act as containers (namespaces) for switches and functions.
 * The client and server must agree in advance on the nodes that exist.
 * The server SHOULD implement a default public node named "default".
 
@@ -71,7 +71,7 @@ A node document specifies the node properties, and has references to all public 
 
     <?xml version="1.0"?>
     <suns xmlns="http://digistan.org/schema/suns">
-    <node title="{description}">
+      <node title="{description}">
         [ <switch
             name="{name}"
             title="{description}"
@@ -82,20 +82,121 @@ A node document specifies the node properties, and has references to all public 
             title="{description}"
             type="{type}"
             href="{URI}" /> ] ...
-    </node>
+      </node>
     </suns>
 
 The node document does not necessarily list all functions and switches: clients may create these as private and thus make them inaccessible through discovery.
 
 ### Functions
 
-To be defined.
+Functions follow these rules:
+
+* A function is a named computation resource, e.g. a thread, a process, a virtual machine.
+* The server MAY implement a set of configured public functions.
+* Clients MAY create private functions for their own use.
+* To create a new function the client POSTs a function document to the parent node URI.
+
+SUNS allows these methods on a function URI:
+
+* GET - retrieves the function definition.
+* PUT - updates the function. The function name and type cannot be modified.
+* DELETE - deletes the function.
+
+The XML specification for a function has this format:
+
+    <?xml version="1.0"?>
+    <suns xmlns="http://digistan.org/schema/suns">
+      <function
+        name="{function name}"              mandatory function name
+        [ type="{function type}" ]          optional type
+        [ title="{short title}" ]           optional title
+        />
+    </suns>
+
+The function type defines the implementation of the function. Function types are still to be defined. If the client attempts to create a function with an unknown type, the server responds with "400 Bad Request".
 
 ### Switches
 
-To be defined.
+Switches follow these rules:
+
+* A switch is a network traffic management resource, and can be virtual or physical.
+* The server MAY implement a set of configured public switches.
+* Clients MAY create private switches for their own use.
+* To create a new switch the client POSTs a switch document to the parent node URI.
+
+SUNS allows these methods on a switch URI:
+
+* GET - retrieves the switch representation.
+* PUT - updates the switch. The switch name and type cannot be modified.
+* POST - creates a new port in the switch.
+* DELETE - deletes the switch.
+
+The XML specification for a new switch has this format:
+
+    <?xml version="1.0"?>
+    <suns xmlns="http://digistan.org/schema/suns">
+      <switch
+        [ type="{switch type}" ]            optional type
+        [ title="{short title}" ]           optional title
+        />
+    </suns>
+
+The XML description of an existing switch has this format:
+
+    <?xml version="1.0"?>
+    <suns xmlns="http://digistan.org/schema/suns">
+      <switch
+        name="{switch name}"                server-generated hash
+        type="{switch type}"                actual switch type
+        [ title="{short title}" ]           title, if specified
+        >
+        [ <port href="{port URI}"
+            type="{port type}" /> ] ...
+      </switch>
+    </suns>
+
+The switch type defines the implementation of the switch. Switch types are still to be defined. If the client attempts to create a switch with an unknown type, the server responds with "400 Bad Request".
 
 ### Ports
 
-To be defined.
+Ports follow these rules:
+
+* A port is a network traffic management resource, and can be virtual or physical.
+* The server MAY implement a set of configured public portes.
+* Clients MAY create private portes for their own use.
+* To create a new port the client POSTs a port document to the parent node URI.
+
+SUNS allows these methods on a port URI:
+
+* GET - retrieves the port representation.
+* PUT - updates the port. The port name and type cannot be modified.
+* POST - creates a new port in the port.
+* DELETE - deletes the port.
+
+The XML specification for a new port has this format:
+
+    <?xml version="1.0"?>
+    <suns xmlns="http://digistan.org/schema/suns">
+      <port
+        [ type="{port type}" ]            optional type
+        [ title="{short title}" ]           optional title
+        />
+    </suns>
+
+The XML description of an existing port has this format:
+
+    <?xml version="1.0"?>
+    <suns xmlns="http://digistan.org/schema/suns">
+      <port
+        name="{port name}"                server-generated hash
+        type="{port type}"                actual port type
+        [ title="{short title}" ]           title, if specified
+        >
+        [ <port href="{port URI}"
+            type="{port type}" /> ] ...
+      </port>
+    </suns>
+
+The port type defines the implementation of the port. Port types are still to be defined. If the client attempts to create a port with an unknown type, the server responds with "400 Bad Request".
+
 
