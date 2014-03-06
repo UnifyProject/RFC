@@ -694,6 +694,27 @@ To retrieve a specific track, the client once again uses the URI provided by the
 
     ...opaque binary content...
 
+## Response Status Codes
+
+In this specification, these server reply codes have specific significance:
+
+* 200 OK - the request completed normally.
+* 201 Created - a POST request succeeded.
+* 204 No Content - an empty PUT request completed, with no effect.
+* 304 Not Modified - a conditional GET request completed, with no effect.
+* 400 Bad Request - a resource document was invalid.
+* 403 Forbidden - a requested method was not allowed on a resource.
+* 404 Not Found - the resource did not exist.
+* 412 Precondition Failed - a conditional PUT or DELETE was not carried out.
+
+Clients should be capable of handling all HTTP errors, including:
+
+* 401 Unauthorized - authentication is required.
+* 413 Too Large - the request was too large.
+* 500 Internal Error - the server suffered an internal error.
+* 501 Not Implemented - the requested functionality is not implemented.
+* 503 Overloaded - the server was overloaded.
+
 ### Handling Unknown Elements and Attributes
 
 Resource documents may contain elements, and unknown attributes on known elements. This is especially likely when the client and server implement different versions of the API, or if the API is extended by a particular client or server implementation.

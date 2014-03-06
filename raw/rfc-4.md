@@ -21,3 +21,37 @@ To be defined. The idea is to encode each method as a formal message, with heade
 
 This allows us to build a fixed XRAP-ZMTP library to carry payloads for any schema.
 
+POST - create a new, dynamically named resource.
+POST-OK
+* Location - a URI that identifies newly created resource.
+GET - retrieve the representation of a known resource.
+* If-Modified-Since - a conditional GET using resource date.
+* If-None-Match - a conditional GET using resource ETag.
+* When-Modified-After - GET on resource date change.
+* When-None-Match - GET on resource ETag change.
+GET-OK
+* ETag - an opaque hash tag that identifies a resource instance.
+* Date-Modified - the date and time that resource was modified.
+PUT - update a known resource.
+* If-Unmodified-Since - a conditional PUT or DELETE using resource date.
+* If-Match - a conditional PUT or DELETE using resource ETag.
+PUT-OK
+DELETE - remove a known resource.
+* If-Unmodified-Since - a conditional PUT or DELETE using resource date.
+* If-Match - a conditional PUT or DELETE using resource ETag.
+DELETE-OK
+ERROR
+
+## Profiles
+
+This specification does not specify the semantics of function, join, and switch types. These semantics are covered in separate *profile* specifications. Profiles are the main area of extension and experimentation in SUNS. Profiles follow these rules:
+
+* The profile name is the specification name (number/Name).
+* The server MUST list all the profiles it supports, in the node document.
+* The server MUST NOT implement two profiles that have overlapping resource types.
+* The client SHOULD check that the profiles it plans to use are implemented.
+
+A profile defines the semantics of a set of function, join, and switch types. As part of that, the profile specification MAY extend the properties of functions, joins, or switches. A profile SHOULD work within the constraints defined by XARP as far as possible.
+
+Profiles may depend on other profiles. The profile specification MUST list the profiles it directly depends on. When a server implements a particular profile it MUST implement all profiles that profile depends on, recursively until all dependencies are resolved.
+

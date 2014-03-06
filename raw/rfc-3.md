@@ -40,7 +40,7 @@ SUNS defines one schema, "suns", with this structure:
         |
         o- function
 
-## SUNS resource types
+## SUNS Resource Types
 
 ### Nodes
 
@@ -113,13 +113,21 @@ The XML specification for a function has this format:
         />
     </suns>
 
-The function type defines the implementation of the function. Function types are still to be defined. If the client attempts to create a function with an unknown type, the server responds with "400 Bad Request".
+The type defines the implementation of the function, and are defined by the server configuration. We do not at this stage standardize function types. If the client attempts to create a function with an unknown type, the server responds with "400 Bad Request". If the client specifies no type, the server shall use a suitable default type.
+
+- number of CPUs
+- CPU quota (usec)
+- memory (bytes)
+- disk elements (preconfigured)
+--> all physical elements preconfigured as profiles
+- for compute, storage, memory
+
 
 ### Switches
 
 Switches follow these rules:
 
-* A switch is a network traffic management resource, and can be virtual or physical.
+* A switch is a named network traffic management resource, and can be virtual or physical.
 * The server MAY implement a set of configured public switches.
 * Clients MAY create private switches for their own use.
 * To create a new switch the client POSTs a switch document to the parent node URI.
@@ -136,6 +144,7 @@ The XML specification for a new switch has this format:
     <?xml version="1.0"?>
     <suns xmlns="http://digistan.org/schema/suns">
       <switch
+        name="{switch name}"                mandatory switch name
         [ type="{switch type}" ]            optional type
         [ title="{short title}" ]           optional title
         />
@@ -146,7 +155,7 @@ The XML description of an existing switch has this format:
     <?xml version="1.0"?>
     <suns xmlns="http://digistan.org/schema/suns">
       <switch
-        name="{switch name}"                server-generated hash
+        name="{switch name}"                switch name
         type="{switch type}"                actual switch type
         [ title="{short title}" ]           title, if specified
         >
@@ -155,22 +164,18 @@ The XML description of an existing switch has this format:
       </switch>
     </suns>
 
-The switch type defines the implementation of the switch. Switch types are still to be defined. If the client attempts to create a switch with an unknown type, the server responds with "400 Bad Request".
+The type defines the implementation of the switch, and are defined by the server configuration. We do not at this stage standardize switch types. If the client attempts to create a switch with an unknown type, the server responds with "400 Bad Request". If the client specifies no type, the server shall use a suitable default type.
 
 ### Ports
 
 Ports follow these rules:
 
-* A port is a network traffic management resource, and can be virtual or physical.
-* The server MAY implement a set of configured public portes.
-* Clients MAY create private portes for their own use.
-* To create a new port the client POSTs a port document to the parent node URI.
+* To be defined.
 
 SUNS allows these methods on a port URI:
 
 * GET - retrieves the port representation.
-* PUT - updates the port. The port name and type cannot be modified.
-* POST - creates a new port in the port.
+* PUT - updates the port.
 * DELETE - deletes the port.
 
 The XML specification for a new port has this format:
@@ -178,7 +183,7 @@ The XML specification for a new port has this format:
     <?xml version="1.0"?>
     <suns xmlns="http://digistan.org/schema/suns">
       <port
-        [ type="{port type}" ]            optional type
+        [ type="{port type}" ]              optional type
         [ title="{short title}" ]           optional title
         />
     </suns>
@@ -188,15 +193,10 @@ The XML description of an existing port has this format:
     <?xml version="1.0"?>
     <suns xmlns="http://digistan.org/schema/suns">
       <port
-        name="{port name}"                server-generated hash
-        type="{port type}"                actual port type
+        name="{port name}"                  server-generated hash
+        type="{port type}"                  actual port type
         [ title="{short title}" ]           title, if specified
         >
-        [ <port href="{port URI}"
-            type="{port type}" /> ] ...
       </port>
     </suns>
-
-The port type defines the implementation of the port. Port types are still to be defined. If the client attempts to create a port with an unknown type, the server responds with "400 Bad Request".
-
 
