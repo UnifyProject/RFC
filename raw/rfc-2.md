@@ -1,4 +1,4 @@
-# Extensible Resource Access Protocol (XRAP)
+# An Extensible Resource Access Protocol (XRAP)
 
 This document proposes the Extensible Resource Access Protocol, a set of conventions for working with remote resources. XRAP divides domain-specific APIs from transport layers (HTTP, ZMTP, IPC, etc.), and ensures that such APIs have a consistent grammar.
 

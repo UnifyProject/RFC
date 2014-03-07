@@ -1,4 +1,4 @@
-# Simple Universal Node Schema (SUNS)
+# A Simple Universal Node Schema (SUNS)
 
 This document proposes the Simple Universal Node Schema, a resource model for working with UNIFY "Universal Nodes". SUNS defines the resources that a client can create, modify, retrieve, and delete on a node (the "server").
 
@@ -41,6 +41,8 @@ SUNS defines one schema, "suns", with this structure:
         o- function
 
 ## SUNS Resource Types
+
+-> "type" is overloaded, use "profile"
 
 ### Nodes
 
@@ -199,4 +201,18 @@ The XML description of an existing port has this format:
         >
       </port>
     </suns>
+
+
+## Profiles
+
+This specification does not specify the semantics of function, join, and switch types. These semantics are covered in separate *profile* specifications. Profiles are the main area of extension and experimentation in SUNS. Profiles follow these rules:
+
+* The profile name is the specification name (number/Name).
+* The server MUST list all the profiles it supports, in the node document.
+* The server MUST NOT implement two profiles that have overlapping resource types.
+* The client SHOULD check that the profiles it plans to use are implemented.
+
+A profile defines the semantics of a set of function, join, and switch types. As part of that, the profile specification MAY extend the properties of functions, joins, or switches. A profile SHOULD work within the constraints defined by XARP as far as possible.
+
+Profiles may depend on other profiles. The profile specification MUST list the profiles it directly depends on. When a server implements a particular profile it MUST implement all profiles that profile depends on, recursively until all dependencies are resolved.
 
