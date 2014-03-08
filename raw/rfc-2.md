@@ -237,7 +237,6 @@ The server may return these response codes specifically for a GET request:
 
 * 200 OK - the resource already existed as specified (only for public resources).
 * 304 Not Modified - the client already has the latest copy of the resource.
-* 400 Bad Request - the resource document was incomplete or badly formatted.
 
 In case of a 4xx or 5xx error response the server will return a textual error message in the content body of the response. The client should be able to handle all normal HTTP errors, such as "401 Unauthorized", "404 Not Found", "413 Too Large", "500 Internal Error", and so on.
 
