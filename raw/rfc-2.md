@@ -74,7 +74,7 @@ All methods work orthogonally on all types of resources, whether those resources
 
 We use these headers, with their HTTP/1.1 meanings:
 
-* Location - a URI that identifies newly created resource.
+* Location - a URN that identifies newly created resource.
 * ETag - an opaque hash tag that identifies a resource instance.
 * Date-Modified - the date and time that resource was modified.
 * If-Modified-Since - a conditional GET using resource date.
@@ -91,21 +91,25 @@ All replies contain a 3-digit status code that conforms to the [HTTP/1.1 specifi
 
 ### XRAP Resources
 
-Server-side resources are either *public* (shared by many clients) or *private* (to a single client). Public resources are named by formal or informal agreement, while the server alone is responsible for naming private resources. The URI of a resource is based on the resource name, so clients can know the URIs of public resources in advance, while the server provides the URIs of private resources at runtime.
+Server-side resources are either *public* (shared by many clients) or *private* (to a single client). Public resources are named by formal or informal agreement, while the server alone is responsible for naming private resources. The URN of a resource is based on the resource name, so clients can know the URNs of public resources in advance, while the server provides the URNs of private resources at runtime.
 
-Resources are either *structured* or *opaque*. A structured resource has properties that both client and server can access and modify. Resources can contain references (URIs) to child resources. An opaque resource has a MIME type and a binary content that the API never examines nor modifies.
+Resources are either *structured* or *opaque*. A structured resource has properties that both client and server can access and modify. Resources can contain references (URNs) to child resources. An opaque resource has a MIME type and a binary content that the API never examines nor modifies.
 
-The resource types form a static *schema* attached to a root type. The set of actual resources that a server holds form a dynamic *resource tree*, attached to a public root resource. To navigate the resource tree, clients retrieve the root resource and inspect it. Not all resources are discoverable: to work with a private resource an client must have created it, and thus know its URI.
+The resource types form a static *schema* attached to a root type. The set of actual resources that a server holds form a dynamic *resource tree*, attached to a public root resource. To navigate the resource tree, clients retrieve the root resource and inspect it. Not all resources are discoverable: to work with a private resource an client must have created it, and thus know its URN.
 
 The API represents structured resources as interchangeable XML or JSON *resource documents*, at the choice of the client. XRAP specifies the grammar for representing resources and their properties.
 
-Lastly the API has three mechanisms for lazy asynchronous retrieval and delivery of resources, and one mechanism for event-driven monitoring of resource updates. RESTful APIs, like HTTP, are nominally synchronous and use a request-response pattern for all resource actions. The first mechanism is the *asynclet* resource, given a URI before it exists: the client retrieves the asynclet and receives the resource as soon as it comes into existence. The second mechanism is more typical for HTTP: *streaming* of new resources to the client, typically used for event notification. Lastly, a client can ask to be notified when a resource is changed.
+Lastly the API has three mechanisms for lazy asynchronous retrieval and delivery of resources, and one mechanism for event-driven monitoring of resource updates. RESTful APIs, like HTTP, are nominally synchronous and use a request-response pattern for all resource actions. The first mechanism is the *asynclet* resource, given a URN before it exists: the client retrieves the asynclet and receives the resource as soon as it comes into existence. The second mechanism is more typical for HTTP: *streaming* of new resources to the client, typically used for event notification. Lastly, a client can ask to be notified when a resource is changed.
 
-#### Resource URIs
+#### Resource Names (URNs)
 
 Resources can be created by various parties at different times: by the server at startup, by clients at runtime, or by the server as the consequence of other events, at runtime. Only the party that created a resource can delete it, and it may place restrictions on other parties' right to work with the resource.
 
-The URI for a public resource is derived from the resource type and name as follows:
+The URN for a public resource is derived from the resource type and name as follows:
+
+    /{schema}/{resource type}/{resource name}
+
+The corresponding URI is prefixed by a protocol and endpoint (e.g. the hostname and port):
 
     {transport}://{endpoint}/{schema}/{resource type}/{resource name}
 
@@ -113,11 +117,11 @@ The fields have this meaning:
 
 * transport - the name of the transport, e.g. "http" or "zmtp".
 * endpoint - a network endpoint, which depends on the transport.
-* schema - the name of the resource schema.
-* resource type - the name of the resource type.
+* schema - the name of the resource schema, which may not contain '/' characters.
+* resource type - the name of the resource type, which may not contain '/' characters.
 * resource name - the name of the resource itself.
 
-The URI for a private resource follows an identical format, where resource type is "resource" and resource name is a hash generated by the server:
+The URN for a private resource follows an identical format, where resource type is "resource" and resource name is a hash generated by the server:
 
     {transport}://{endpoint}/{schema}/resource/{resource hash}
 
@@ -127,22 +131,22 @@ Note that "resource" is a reserved word and SHALL NOT be used as a resource type
 
 Clients create new resources through the API as follows:
 
-* The client must know the URI of the parent for the new resource it wants to create.
-* The client POSTs a specification for the new resource to the parent URI.
+* The client must know the URN of the parent for the new resource it wants to create.
+* The client POSTs a specification for the new resource to the parent URN.
 * The client creates a public resource by specifying a name. Otherwise the server names the resource, which is then private.
 * The server either returns a status code 2xx with a resource document, or 4xx or 5xx with an error text.
-* The server, after creating the resource, returns "201 Created" with the new URI in the Location: header.
+* The server, after creating the resource, returns "201 Created" with the new URN in the Location: header.
 
 Here is the walkthrough from client to server:
 
     Client                                     Server
     |                                           |
-    |  1.) POST to parent URI                   |
+    |  1.) POST to parent URN                   |
     |      Resource specifications              |
     |------------------------------------------>|
     |                                           |
     |  2.) 201 Created                          |
-    |      Location: Resource URI               |
+    |      Location: Resource URN               |
     |<------------------------------------------|
     |                                           |
 
@@ -152,7 +156,7 @@ This is the general form of a client HTTP request to create a dynamic resource, 
 
     Client:
     -------------------------------------------------
-    POST /{parent uri} HTTP/1.1
+    POST /{parent urn} HTTP/1.1
     Content-Type: application/{schema}+xml
 
     <?xml version="1.0"?>
@@ -168,7 +172,7 @@ This is the general form of a client HTTP request to create a dynamic resource, 
     Content-Type: application/{schema}+xml
     Date-Modified: {resource date and time}
     ETag: {resource entity tag}
-    Location: {resource URI}
+    Location: {resource URN}
 
     <?xml version="1.0"?>
     <{schema} xmlns="http://digistan.org/schema/{schema}">
@@ -180,9 +184,9 @@ This is the general form of a client HTTP request to create a dynamic resource, 
 The server may return these response codes specifically for a POST request:
 
 * 200 OK - the resource already existed as specified (only possible for public resources).
-* 201 Created - the server created the resource, and the Location: header provides the URI.
+* 201 Created - the server created the resource, and the Location: header provides the URN.
 * 400 Bad Request - the resource specification was incomplete or badly formatted.
-* 403 Forbidden - the POST method is not allowed on the parent URI.
+* 403 Forbidden - the POST method is not allowed on the parent URN.
 
 In case of a 4xx or 5xx error response the server will return a textual error message in the content body of the response. The client should be able to handle all normal HTTP errors, such as "401 Unauthorized", "404 Not Found", "413 Too Large", "500 Internal Error", and so on.
 
@@ -192,8 +196,8 @@ Creating public resources is *idempotent*, i.e. repeated requests to create the 
 
 Clients retrieve resources through the API as follows:
 
-* The client must know the URI of the resource that it wants to retrieve.
-* The client sends a GET method to the resource URI.
+* The client must know the URN of the resource that it wants to retrieve.
+* The client sends a GET method to the resource URN.
 * The client optionally specifies headers to do a conditional retrieval (caching).
 * The server either returns "200 OK" with a resource document, "304 Not Modified" with no content, or 4xx or 5xx with an error text.
 
@@ -201,10 +205,10 @@ Here is the walkthrough from client to server:
 
     Client                                     Server
     |                                           |
-    |  1.) GET to Resource URI                  |
+    |  1.) GET to Resource URN                  |
     |------------------------------------------>|
     |                                           |
-    |  2.) 200 Ok                               |
+    |  2.) 200 OK                               |
     |      Resource representation              |
     |<------------------------------------------|
     |                                           |
@@ -213,7 +217,7 @@ This is the general form of an unconditional client HTTP request to retrieve a r
 
     Client:
     -------------------------------------------------
-    GET /{resource uri} HTTP/1.1
+    GET /{resource urn} HTTP/1.1
 
     Server:
     -------------------------------------------------
@@ -248,7 +252,7 @@ This is the general form of a client HTTP request to conditionally retrieve a re
 
     Client:
     -------------------------------------------------
-    GET /{resource uri} HTTP/1.1
+    GET /{resource urn} HTTP/1.1
     If-None-Match: {resource entity tag}
     If-Modified-Since: {resource date and time}
 
@@ -260,9 +264,9 @@ Retrieving a resource has *no side effects*, i.e. repeated requests to retrieve 
 
 Clients update resources through the API as follows:
 
-* The client must know the URI of the resource that it wants to update.
+* The client must know the URN of the resource that it wants to update.
 * The client should have retrieved the resource before updating it.
-* The client sends a PUT method to the resource URI with the modified resource document.
+* The client sends a PUT method to the resource URN with the modified resource document.
 * The client optionally specifies headers to do a conditional update.
 * The server either returns 2xx with a resource document, or 4xx or 5xx with an error text.
 
@@ -270,14 +274,14 @@ Here is the walkthrough from client to server:
 
     Client                                     Server
     |                                           |
-    |  1.) GET to Resource URI                  |
+    |  1.) GET to Resource URN                  |
     |------------------------------------------>|
     |                                           |
     |  2.) 200 OK                               |
     |      Resource representation              |
     |<------------------------------------------|
     |                                           |
-    |  3.) PUT to Resource URI                  |
+    |  3.) PUT to Resource URN                  |
     |      Modified resource representation     |
     |------------------------------------------>|
     |                                           |
@@ -288,7 +292,7 @@ This is the general form of a client HTTP request to unconditionally modify a re
 
     Client:
     -------------------------------------------------
-    PUT /{resource uri} HTTP/1.1
+    PUT /{resource urn} HTTP/1.1
     Content-Type: application/{schema}+xml
 
     <?xml version="1.0"?>
@@ -324,7 +328,7 @@ This is the general form of a client HTTP request to conditionally update a reso
 
     Client:
     -------------------------------------------------
-    PUT /{resource uri} HTTP/1.1
+    PUT /{resource urn} HTTP/1.1
     If-Match: {resource entity tag}
     If-Unmodified-Since: {resource date and time}
 
@@ -336,9 +340,9 @@ Modifying resources is *idempotent*, i.e. repeated requests to modify the same r
 
 Clients delete resources through the API as follows:
 
-* The client must know the URI of the resource that it wants to delete.
+* The client must know the URN of the resource that it wants to delete.
 * The client should have retrieved the resource before trying to delete it.
-* The client sends a DELETE method, specifying the resource URI.
+* The client sends a DELETE method, specifying the resource URN.
 * The client optionally specifies headers to do a conditional delete.
 * The server either returns "200 OK", or 4xx or 5xx with an error text.
 
@@ -346,14 +350,14 @@ Here is the walkthrough from client to server:
 
     Client                                     Server
     |                                           |
-    |  1.) GET to Resource URI                  |
+    |  1.) GET to Resource URN                  |
     |------------------------------------------>|
     |                                           |
     |  2.) 200 OK                               |
     |      Resource representation              |
     |<------------------------------------------|
     |                                           |
-    |  3.) DELETE to resource URI               |
+    |  3.) DELETE to resource URN               |
     |------------------------------------------>|
     |                                           |
     |  4.) 200 OK                               |
@@ -364,7 +368,7 @@ This is the general form of a client HTTP request to unconditionally delete a re
 
     Client:
     -------------------------------------------------
-    DELETE /{resource uri} HTTP/1.1
+    DELETE /{resource urn} HTTP/1.1
 
     Server:
     -------------------------------------------------
@@ -389,13 +393,13 @@ This is the general form of a client HTTP request to conditionally delete a reso
 
     Client:
     -------------------------------------------------
-    DELETE /{resource uri} HTTP/1.1
+    DELETE /{resource urn} HTTP/1.1
     If-Match: {resource entity tag}
     If-Unmodified-Since: {resource date and time}
 
 A conditional DELETE only takes effect if there were no other errors, i.e. if the result would otherwise be "200 OK". It is valid to send either of the If-Match: or If-Unmodified-Since: headers but for best results, use both.
 
-Deleting resources is *idempotent*, i.e. repeated requests to delete the same resource are allowed, and safe. Implementations may cache the URIs of deleted resources in order to differentiate between deletes on already-deleted resources, and deletes on resources that never existed.
+Deleting resources is *idempotent*, i.e. repeated requests to delete the same resource are allowed, and safe. Implementations may cache the URNs of deleted resources in order to differentiate between deletes on already-deleted resources, and deletes on resources that never existed.
 
 If the resource to be deleted contains other resources, these are implicitly and silently deleted along with the resource.
 
@@ -407,7 +411,7 @@ When the client retrieves a resource it MAY specify which MIME type it desires u
 * "application/{schema}+json"
 * "text/xml", or empty, which are equivalent.
 
-The server will respond with a resource document in the requested format and a Content-Type: header of the appropriate type. Note that most browsers will display "text/xml" documents as XML, while they will not show "application/{schema}+xml". Thus it is possible to embed XRAP resource URIs in, for example, HTML documents, with usable results.
+The server will respond with a resource document in the requested format and a Content-Type: header of the appropriate type. Note that most browsers will display "text/xml" documents as XML, while they will not show "application/{schema}+xml". Thus it is possible to embed XRAP resource URNs in, for example, HTML documents, with usable results.
 
 When a client creates a new resource or modifies an existing resource, it SHOULD specify the MIME type of the resource document that it is sending to the browser, using the Content-Type: header. XRAP allows the same three values as for the Accept: header:
 
@@ -435,29 +439,29 @@ The three asynchronous delivery mechanisms are:
 
 #### Creation Notification via Asynclets
 
-An asynclet is a resource that is given a URI identifier *before* it exists. When the client retrieves the asynclet, the server will respond only when the resource has come into existence.
+An asynclet is a resource that is given a URN identifier *before* it exists. When the client retrieves the asynclet, the server will respond only when the resource has come into existence.
 
 Asynclets are used in a specific case: when resources sit in some kind of a queue that is retrieved and emptied by the client (using GET and DELETE in a loop). The queue would be the parent resource (the "container"). The queue then contains zero or more existing resources plus a single asynclet.
 
 A normal resource is identified in a container resource by a href attribute, and other attributes:
 
-    <some-type href="some-URI" ... />
+    <some-type href="some-URN" ... />
 
-An asynclet has the href attribute and a second attribute 'async="1"', telling the client that this resource, though it has a URI, does not in fact yet exist:
+An asynclet has the href attribute and a second attribute 'async="1"', telling the client that this resource, though it has a URN, does not in fact yet exist:
 
-    <some-type href="some-URI" async="1" />
+    <some-type href="some-URN" async="1" />
 
 When the client retrieves an asynclet, the server waits until the resource is created, within that container, and it then responds to the client with the contents of that new resource.
 
 When the client retrieves the asynclet container, the container resource holds all existing resources plus a single asynclet:
 
-    <some-type href="some-URI-1" ... />
-    <some-type href="some-URI-2" ... />
-    <some-type href="some-URI-3" ... />
-    <some-type href="some-URI-4" ... />
-    <some-type href="some-URI-5" async="1" />
+    <some-type href="some-URN-1" ... />
+    <some-type href="some-URN-2" ... />
+    <some-type href="some-URN-3" ... />
+    <some-type href="some-URN-4" ... />
+    <some-type href="some-URN-5" async="1" />
 
-At any time a new resource may 'arrive' and the URI held by a client for an asynclet will then refer to a real existing resource. This is transparent to the client except that there will be no wait when the client issues a GET on that URI.
+At any time a new resource may 'arrive' and the URN held by a client for an asynclet will then refer to a real existing resource. This is transparent to the client except that there will be no wait when the client issues a GET on that URN.
 
 #### Update Notification
 
@@ -465,14 +469,14 @@ Applications can monitor specific resources for updates using two HTTP extension
 
     Client:
     -------------------------------------------------
-    GET /{resource uri} HTTP/1.1
+    GET /{resource urn} HTTP/1.1
     When-None-Match: {resource entity tag}
 
 The client can also specify the last-known modified date and time, the current date and time, or a later date and time:
 
     Client:
     -------------------------------------------------
-    GET /{resource uri} HTTP/1.1
+    GET /{resource urn} HTTP/1.1
     When-Modified-After: {resource date and time}
 
 The server will respond with the new resource document when it is modified. The client should be able to handle any HTTP error condition, such as "404 Not Found" or "501 Not Implemented". If both headers are specified, the server will respond only when both conditions are true.
@@ -524,8 +528,8 @@ XRAP resource documents have a schema-independent regular grammar designed to su
 * This hierarchy of resource types forms a static type tree attached to a single root type.
 * At runtime, the actual resources form an actual resource tree attached to a single root resource.
 * Clients navigate the actual resource tree by retrieving the root resource.
-* Resources that are containers will contain URI references to accessible child resources.
-* A private resource is accessible only to the client that created it, and knows its URI.
+* Resources that are containers will contain URN references to accessible child resources.
+* A private resource is accessible only to the client that created it, and knows its URN.
 
 Our goals with this design are:
 
@@ -622,10 +626,10 @@ Note that it is possible to map between JSON and XML without loss. The key rule 
 
 XRAP documents use the following rule to allow navigation and discovery:
 
-* The attribute "href", if present, holds the URI for the resource that the element represents.
-* The URI for the root resource is known to both client and server by common agreement.
-* The URIs for all non-root resources are generated by the server and may be stored by the client.
-* All URIs provided by the server are absolute. The client at the HTTP level should use URIs with no scheme or hostname.
+* The attribute "href", if present, holds the URN for the resource that the element represents.
+* The URN for the root resource is known to both client and server by common agreement.
+* The URNs for all non-root resources are generated by the server and may be stored by the client.
+* All URNs provided by the server are absolute. The client at the HTTP level should use URNs with no scheme or hostname.
 
 Here is an example of a client retrieving a public playlist resource using a HTTP GET method, with the server's response. The server is at host.com:
 
@@ -643,17 +647,17 @@ Here is an example of a client retrieving a public playlist resource using a HTT
     <playlist name="default">
         <album
             artist="Echobelly" title="On"
-            href="http://host.com/music/resource/A1023" />
+            href="/music/resource/A1023" />
         <album
             artist="Muse" title="Showbiz"
-            href="http://host.com/music/resource/A0911" />
+            href="/music/resource/A0911" />
         <album
             artist="Toumani Diabate" title="Djelika"
-            href="http://host.com/music/resource/A0023" />
+            href="/music/resource/A0023" />
     </playlist>
     </music>
 
-To retrieve a specific album, the client uses the URI provided by the server, for example:
+To retrieve a specific album, the client uses the URN provided by the server, for example:
 
     Client:
     -------------------------------------------------
@@ -670,17 +674,17 @@ To retrieve a specific album, the client uses the URI provided by the server, fo
             artist="Echobelly" title="On" released="1995-10-17"
             summary="Underrated, bittersweet guitar rock perfection"
         <track title="Car Fiction" length="2:31"
-            href="http://host.com/music/resource/A1023/1" />
+            href="/music/resource/A1023/1" />
         <track title="King of the Kerb" length="3:59"
-            href="http://host.com/music/resource/A1023/2" />
+            href="/music/resource/A1023/2" />
         ...
         ...
         <track title="Worms and Angels" length="2:38"
-            href="http://host.com/music/resource/A1023/12" />
+            href="/music/resource/A1023/12" />
         </album>
     </music>
 
-To retrieve a specific track, the client once again uses the URI provided by the server. Note that in this case the server delivers a content of type "audio/mpeg-3", which the client should process accordingly (and not as XRAP XML or JSON):
+To retrieve a specific track, the client once again uses the URN provided by the server. Note that in this case the server delivers a content of type "audio/mpeg-3", which the client should process accordingly (and not as XRAP XML or JSON):
 
     Client:
     -------------------------------------------------
@@ -723,7 +727,7 @@ Clients and servers should tolerate and ignore unknown elements. Neither the cli
 
 ## Security Aspects
 
-XRAP assumes the underlying transport provides authentication and privacy, if needed. XRAP establishes access control through the use of secret URIs known only to owning clients. XRAP does not specify how long or unguessable such URIs are; this is left to the server implementor. The mechanism used to generate private URIs is entirely local to a server and can be improved unilaterally.
+XRAP assumes the underlying transport provides authentication and privacy, if needed. XRAP establishes access control through the use of secret URNs known only to owning clients. XRAP does not specify how long or unguessable such URNs are; this is left to the server implementor. The mechanism used to generate private URNs is entirely local to a server and can be improved unilaterally.
 
 ## Further Reading
 
