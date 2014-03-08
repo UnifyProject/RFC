@@ -1,4 +1,4 @@
-# Simple Universal Node Schema (SUNS)
+# A Simple Universal Node Schema (SUNS)
 
 This document proposes the Simple Universal Node Schema, a resource model for working with UNIFY "Universal Nodes". SUNS defines the resources that a client can create, modify, retrieve, and delete on a node (the "server").
 
@@ -40,7 +40,9 @@ SUNS defines one schema, "suns", with this structure:
         |
         o- function
 
-## SUNS resource types
+## SUNS Resource Types
+
+-> "type" is overloaded, use "profile"
 
 ### Nodes
 
@@ -50,7 +52,7 @@ Nodes follow these rules:
 * The server MAY implement multiple nodes.
 * Nodes MAY be used to partition resources for authenticated access control.
 * Nodes are configured resources: clients do not create or destroy nodes.
-* Nodes act as namespaces for switches and functions.
+* Nodes act as containers (namespaces) for switches and functions.
 * The client and server must agree in advance on the nodes that exist.
 * The server SHOULD implement a default public node named "default".
 
@@ -71,7 +73,7 @@ A node document specifies the node properties, and has references to all public 
 
     <?xml version="1.0"?>
     <suns xmlns="http://digistan.org/schema/suns">
-    <node title="{description}">
+      <node title="{description}">
         [ <switch
             name="{name}"
             title="{description}"
@@ -82,20 +84,135 @@ A node document specifies the node properties, and has references to all public 
             title="{description}"
             type="{type}"
             href="{URI}" /> ] ...
-    </node>
+      </node>
     </suns>
 
 The node document does not necessarily list all functions and switches: clients may create these as private and thus make them inaccessible through discovery.
 
 ### Functions
 
-To be defined.
+Functions follow these rules:
+
+* A function is a named computation resource, e.g. a thread, a process, a virtual machine.
+* The server MAY implement a set of configured public functions.
+* Clients MAY create private functions for their own use.
+* To create a new function the client POSTs a function document to the parent node URI.
+
+SUNS allows these methods on a function URI:
+
+* GET - retrieves the function definition.
+* PUT - updates the function. The function name and type cannot be modified.
+* DELETE - deletes the function.
+
+The XML specification for a function has this format:
+
+    <?xml version="1.0"?>
+    <suns xmlns="http://digistan.org/schema/suns">
+      <function
+        name="{function name}"              mandatory function name
+        [ type="{function type}" ]          optional type
+        [ title="{short title}" ]           optional title
+        />
+    </suns>
+
+The type defines the implementation of the function, and are defined by the server configuration. We do not at this stage standardize function types. If the client attempts to create a function with an unknown type, the server responds with "400 Bad Request". If the client specifies no type, the server shall use a suitable default type.
+
+- number of CPUs
+- CPU quota (usec)
+- memory (bytes)
+- disk elements (preconfigured)
+--> all physical elements preconfigured as profiles
+- for compute, storage, memory
+
 
 ### Switches
 
-To be defined.
+Switches follow these rules:
+
+* A switch is a named network traffic management resource, and can be virtual or physical.
+* The server MAY implement a set of configured public switches.
+* Clients MAY create private switches for their own use.
+* To create a new switch the client POSTs a switch document to the parent node URI.
+
+SUNS allows these methods on a switch URI:
+
+* GET - retrieves the switch representation.
+* PUT - updates the switch. The switch name and type cannot be modified.
+* POST - creates a new port in the switch.
+* DELETE - deletes the switch.
+
+The XML specification for a new switch has this format:
+
+    <?xml version="1.0"?>
+    <suns xmlns="http://digistan.org/schema/suns">
+      <switch
+        name="{switch name}"                mandatory switch name
+        [ type="{switch type}" ]            optional type
+        [ title="{short title}" ]           optional title
+        />
+    </suns>
+
+The XML description of an existing switch has this format:
+
+    <?xml version="1.0"?>
+    <suns xmlns="http://digistan.org/schema/suns">
+      <switch
+        name="{switch name}"                switch name
+        type="{switch type}"                actual switch type
+        [ title="{short title}" ]           title, if specified
+        >
+        [ <port href="{port URI}"
+            type="{port type}" /> ] ...
+      </switch>
+    </suns>
+
+The type defines the implementation of the switch, and are defined by the server configuration. We do not at this stage standardize switch types. If the client attempts to create a switch with an unknown type, the server responds with "400 Bad Request". If the client specifies no type, the server shall use a suitable default type.
 
 ### Ports
 
-To be defined.
+Ports follow these rules:
+
+* To be defined.
+
+SUNS allows these methods on a port URI:
+
+* GET - retrieves the port representation.
+* PUT - updates the port.
+* DELETE - deletes the port.
+
+The XML specification for a new port has this format:
+
+    <?xml version="1.0"?>
+    <suns xmlns="http://digistan.org/schema/suns">
+      <port
+        [ type="{port type}" ]              optional type
+        [ title="{short title}" ]           optional title
+        />
+    </suns>
+
+The XML description of an existing port has this format:
+
+    <?xml version="1.0"?>
+    <suns xmlns="http://digistan.org/schema/suns">
+      <port
+        name="{port name}"                  server-generated hash
+        type="{port type}"                  actual port type
+        [ title="{short title}" ]           title, if specified
+        >
+      </port>
+    </suns>
+
+
+## Profiles
+
+This specification does not specify the semantics of function, join, and switch types. These semantics are covered in separate *profile* specifications. Profiles are the main area of extension and experimentation in SUNS. Profiles follow these rules:
+
+* The profile name is the specification name (number/Name).
+* The server MUST list all the profiles it supports, in the node document.
+* The server MUST NOT implement two profiles that have overlapping resource types.
+* The client SHOULD check that the profiles it plans to use are implemented.
+
+A profile defines the semantics of a set of function, join, and switch types. As part of that, the profile specification MAY extend the properties of functions, joins, or switches. A profile SHOULD work within the constraints defined by XARP as far as possible.
+
+Profiles may depend on other profiles. The profile specification MUST list the profiles it directly depends on. When a server implements a particular profile it MUST implement all profiles that profile depends on, recursively until all dependencies are resolved.
 
