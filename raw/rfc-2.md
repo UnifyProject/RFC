@@ -304,7 +304,8 @@ This is the general form of a client HTTP request to unconditionally modify a re
     Server:
     -------------------------------------------------
     HTTP/1.1 200 OK
-    Date: {response date}
+    Date-Modified: {resource date and time}
+    ETag: {resource entity tag}
 
 The server may return these response codes specifically for a PUT request:
 
