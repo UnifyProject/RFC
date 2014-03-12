@@ -43,7 +43,7 @@ Our performance goals are at most hundreds of transactions per second. High-perf
 
 ## Design of the Protocol
 
-XRAP defines a consistent protocol for creating, retrieving, updating, and deleting remote resources. To reduce the learning curve and element of surprise, and allow maximum adoption in the market, we have used [RESTful design principles](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm www.ics.uci.edu), and we have kept HTTP/1.1 compatibility.
+XRAP defines a consistent protocol for creating, retrieving, updating, and deleting remote resources. To reduce the learning curve and element of surprise, and allow maximum adoption in the market, we have used [RESTful design principles](http://www.ics.uci.edu/~fielding/pubs/dissertation/rest_arch_style.htm), and we have kept HTTP/1.1 compatibility.
 
 REST is a design pattern rather than a formal specification. It is not formal about e.g. one updates a resource using PUT, or POST, nor does it explain how to represent resources. It is also incomplete in areas such as asynchronous event delivery.
 
