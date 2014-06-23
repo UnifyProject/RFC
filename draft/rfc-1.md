@@ -42,7 +42,7 @@ The project SHOULD require a statement from each contributor that their contribu
 
 Each specification SHALL BE a separate text file, in Markdown format.
 
-Specifications SHALL be named "<state>/rfc-<number>.md" where <state> is one of "raw", "draft", "stable", "legacy", or "retired", and where <number> is a cardinal integer starting at 1.
+Specifications SHALL be named "[state]/rfc-[number].md" where [state] is one of "raw", "draft", "stable", "legacy", or "retired", and where [number] is a cardinal integer starting at 1.
 
 A new version of a specification SHALL be a new specification, with a new number.
 
